@@ -30,19 +30,19 @@ class App:
         array = create_array()
         array_rectangles = create_rectangles(array)
         draw_rectangles(array_rectangles,self.window)
-        cooldownTimer = 0
 
         #loop to get window showing
         array_sorted = False
         quicksort_button = Button(WHITE,50,50,100,100,'Quicksort me!')
-        new_array_button = Button(WHITE,300,50,120,100,'Create new Array')
+        new_array_button = Button(WHITE,500,50,120,100,'Create new Array')
         insertion_sort_button = Button(WHITE,175,50,100,100,'Insert sort me!')
+        selection_sort_button = Button(WHITE,300,50,150,100,'Selection sort me!')
 
         while True:
             quicksort_button.draw(self.window)
             new_array_button.draw(self.window)
             insertion_sort_button.draw(self.window)
-            cooldownTimer += 1
+            selection_sort_button.draw(self.window)
             for event in pygame.event.get():
                 pos = pygame.mouse.get_pos()
                 if event.type == pygame.QUIT:
@@ -62,9 +62,11 @@ class App:
                     if insertion_sort_button.isOver(pos) and not array_sorted:
                         array_sorted = True
                         insertionSort(array,self.window)
-                        #array_rectangles = create_rectangles(array)
-                        #self.window.fill(BLACK)
-                        #draw_rectangles_insertion(array_rectangles,self.window)
+                    if selection_sort_button.isOver(pos) and not array_sorted:
+                        array_sorted = True
+                        new_array = selectionSort(array,self.window)
+                        array_rectangles = create_rectangles(new_array)
+                        draw_rectangles(array_rectangles,self.window)
 
 
                 mainClock.tick(FPS)
@@ -117,7 +119,7 @@ def create_rectangles(arr):
     rectangle_width = ARRAYSIZE[0]//len(arr)
     for i in range(len(arr)):
     # the (1 + i) helps space the bars out to give a "line" effect
-        b = pygame.Rect(50 + (rectangle_width * i + (1+i)), 700, rectangle_width, -arr[i]*300)
+        b = pygame.Rect(50 + (rectangle_width * i + (1+i)), 750, rectangle_width, -arr[i]*300)
         array_rectangles.append(b)
     return array_rectangles
 
@@ -273,8 +275,71 @@ def insertionSort(arr,win):
         update_insertion_sort(arr,win,j)
     return arr
 
+def draw_rectangles_selection(A,win,smallest_index):
+    for i in range(len(A)):
+        if i == smallest_index:
+            pygame.draw.rect(win,RED,A[i])
+        else:
+            pygame.draw.rect(win,BLUE,A[i])
+
+def update_original_list(A,win,smallest_index):
+    new_rect = create_rectangles(A)
+    draw_rectangles_selection(new_rect,win,smallest_index)
+    pygame.display.update()
 
 
+def update_second_list(A,win):
+    new_rect=create_second_list(A)
+    draw_rectangles_selection(new_rect,win,smallest_index=None)
+    pygame.display.update()
+
+def create_second_list(arr):
+    array_rectangles = []
+    rectangle_width = ARRAYSIZE[0]//len(arr)
+    for i in range(len(arr)):
+    # the (1 + i) helps space the bars out to give a "line" effect
+        b = pygame.Rect(50 + (rectangle_width * i + (1+i)), 400, rectangle_width, -arr[i]*300)
+        array_rectangles.append(b)
+    return array_rectangles
+
+def update_selection_sort(A,new_array,win,smallest_index=None):
+    win.fill(BLACK)
+    update_original_list(A,win,smallest_index)
+    update_second_list(new_array,win)
+    time.sleep(.2)
+    pygame.display.update()
+
+def findSmallet(arr,win):
+    """
+    Parameters-
+    Arr- List containing integers
+
+    Returns the index of the smallest element.
+    """
+    smallest = arr[0]
+    smallest_index = 0
+    for i in range(1,len(arr)):
+        if arr[i] < smallest:
+            smallest = arr[i]
+            smallest_index = i
+            update_original_list(arr,win,i)
+    return smallest_index
+
+def selectionSort(arr,win):
+    """
+    Parameters-
+    arr: List of elements to be sorted
+
+    Returns a new sorted list.
+    """
+    new_arr = []
+    for i in range(len(arr)):
+        try:
+            smallest = findSmallet(arr,win)
+            new_arr.append(arr.pop(smallest))
+            update_selection_sort(arr,new_arr,win,smallest)
+        except ZeroDivisionError:
+            return new_arr
 
 
 if __name__ == '__main__':
