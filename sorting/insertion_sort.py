@@ -10,4 +10,5 @@ def insertionSort(arr):
             j -= 1
             arr[j+1] = key
             print(arr)
+            time.sleep(1)
     return arr

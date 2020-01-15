@@ -35,11 +35,13 @@ class App:
         #loop to get window showing
         array_sorted = False
         quicksort_button = Button(WHITE,50,50,100,100,'Quicksort me!')
-        new_array_button = Button(WHITE,200,50,120,100,'Create new Array')
+        new_array_button = Button(WHITE,300,50,120,100,'Create new Array')
+        insertion_sort_button = Button(WHITE,175,50,100,100,'Insert sort me!')
 
         while True:
             quicksort_button.draw(self.window)
             new_array_button.draw(self.window)
+            insertion_sort_button.draw(self.window)
             cooldownTimer += 1
             for event in pygame.event.get():
                 pos = pygame.mouse.get_pos()
@@ -57,6 +59,12 @@ class App:
                         array = create_array()
                         array_rectangles = create_rectangles(array)
                         draw_rectangles(array_rectangles,self.window)
+                    if insertion_sort_button.isOver(pos) and not array_sorted:
+                        array_sorted = True
+                        insertionSort(array,self.window)
+                        #array_rectangles = create_rectangles(array)
+                        #self.window.fill(BLACK)
+                        #draw_rectangles_insertion(array_rectangles,self.window)
 
 
                 mainClock.tick(FPS)
@@ -169,22 +177,22 @@ def partition(A,low,hi,win,A_r):
     """
     pivotIndex = get_pivot(A,low,hi)
     pivotValue = A[pivotIndex]
-    update_quicksort(A,win,pivotIndex)
+    update_quicksort(A,win,pivotIndex,)
     A[pivotIndex],A[low] = A[low],A[pivotIndex]
-    update_quicksort(A,win,pivotIndex,low)
+    update_quicksort(A,win,pivotIndex,low,)
     time.sleep(.1)
     border = low
 
     for i in range(low,hi+1):
-        update_quicksort(A,win,pivotIndex,border,i)
+        update_quicksort(A,win,pivotIndex,border,i,)
         if A[i] < pivotValue:
             border +=1
-            update_quicksort(A,win,pivotIndex,border,i)
+            update_quicksort(A,win,pivotIndex,border,i,)
             A[i],A[border] = A[border],A[i]
             update_quicksort(A,win,pivotIndex,border,i)
 
     A[low], A[border] = A[border], A[low]
-    update_quicksort(A,win,pivotIndex,border,)
+    update_quicksort(A,win,pivotIndex,border)
     return border
 
 def get_pivot(A,low,hi):
@@ -228,6 +236,46 @@ def quicksort2(A,low,hi,win,A_r):
 
 def quicksort(A,win,A_r):
     quicksort2(A,0,len(A)-1,win,A_r)
+
+def draw_rectangles_insertion(A_r,win,j_index):
+    """
+    Parameters-
+    A_r: List of pygame.rect objects
+    win: surface object to draw one
+    j_index: key index
+    j_index + 1: value being compared
+    """
+    for r in range(len(A_r)):
+        if r == j_index:
+            pygame.draw.rect(win,RED,A_r[r])
+        elif r == j_index + 1:
+            pygame.draw.rect(win,YELLOW,A_r[r])
+        else:
+            pygame.draw.rect(win,BLUE,A_r[r])
+
+def update_insertion_sort(A,win,j_index):
+    new_rect = create_rectangles(A)
+    win.fill(BLACK)
+    draw_rectangles_insertion(new_rect, win,j_index)
+    pygame.display.update()
+
+def insertionSort(arr,win):
+    for i in range(1,len(arr)):
+        key = arr[i]
+        j = i - 1
+        while j >= 0 and key < arr[j]:
+            arr[j+1] = arr[j]
+            j -= 1
+            arr[j+1] = key
+            update_insertion_sort(arr,win,j)
+            time.sleep(.1)
+            update_insertion_sort(arr,win,j+1)
+        update_insertion_sort(arr,win,j)
+    return arr
+
+
+
+
 
 if __name__ == '__main__':
     
